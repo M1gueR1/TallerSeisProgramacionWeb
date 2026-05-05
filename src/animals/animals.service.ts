@@ -13,6 +13,8 @@ import { UpdateAnimalDto }  from './dto/update-animal.dto';
 
 import { QueryAnimalsDto } from './dto/query-animals.dto';
 
+import { CloudinaryService }              from '../cloudinary/cloudinary.service';
+
 
 @Injectable()
 export class AnimalsService {
@@ -22,6 +24,7 @@ export class AnimalsService {
   constructor(
     @InjectRepository(Animal)
     private readonly animalRepo: Repository<Animal>,
+    private readonly cloudinaryService: CloudinaryService,
     @InjectRepository(Location)
     private readonly locationRepo: Repository<Location>,
     @InjectRepository(User)
@@ -90,6 +93,23 @@ export class AnimalsService {
     const animal = await this.findOne(id);
     await this.animalRepo.remove(animal);
     return { message: 'Animal eliminado exitosamente' };
+  }
+
+  async uploadImagen(id: string, file: Express.Multer.File): Promise<Animal> {
+    // 1. Verificar que el animal existe (lanza 404 si no)
+    await this.findOne(id);
+
+    // 2. Subir el buffer a Cloudinary y recibir la URL
+    const url = await this.cloudinaryService.uploadBuffer(
+      file.buffer,
+      'animales-adopcion',  // carpeta en tu cuenta Cloudinary
+    );
+
+    // 3. Guardar la URL en la columna "imagen"
+    await this.animalRepo.update(id, { imagen: url });
+
+    // 4. Retornar el animal actualizado
+    return this.findOne(id);
   }
 
   private handleError(err: any) {
