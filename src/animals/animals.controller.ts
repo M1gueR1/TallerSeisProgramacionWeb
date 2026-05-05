@@ -7,6 +7,7 @@ import { QueryAnimalsDto } from './dto/query-animals.dto';
 
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 
 @ApiTags('animals')
@@ -69,6 +70,25 @@ export class AnimalsController {
 
 
   @Post(':id/imagen')
+  @ApiOperation({ summary: 'Subir o reemplazar la foto del animal' })
+  @ApiParam({ name: 'id', type: String, description: 'UUID del animal' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['imagen'],
+      properties: {
+        imagen: {
+          type: 'string',
+          format: 'binary',
+          description: 'Imagen del animal (JPEG, PNG o WebP · máx 2 MB)',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Animal con campo imagen actualizado' })
+  @ApiResponse({ status: 400, description: 'Archivo inválido (tipo o tamaño incorrecto)' })
+  @ApiResponse({ status: 404, description: 'Animal no encontrado' })
   
   @UseInterceptors(FileInterceptor('imagen'))
 
