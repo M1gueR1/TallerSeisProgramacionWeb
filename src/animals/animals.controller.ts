@@ -29,6 +29,7 @@ export class AnimalsController {
 
   @ApiOperation({ summary: 'Listar animales con paginación y filtros' })
   @ApiResponse({ status: 200, description: 'Lista paginada: { data, total, page, limit }' })
+  @ApiResponse({ status: 400, description: 'Parámetros de query inválidos' })
 
   @Get()
   findAll(@Query() query: QueryAnimalsDto) {

@@ -21,6 +21,7 @@ export class AdoptionRequestsController {
 
   @ApiOperation({ summary: 'Listar animales con paginación y filtros' })
   @ApiResponse({ status: 200, description: 'Lista paginada: { data, total, page, limit }' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
 
   @Get()
   findAll() {
@@ -28,9 +29,9 @@ export class AdoptionRequestsController {
   }
 
   @ApiOperation({ summary: 'Obtener un animal por UUID' })
-  @ApiParam({ name: 'id', type: String, description: 'UUID del animal' })
-  @ApiResponse({ status: 200, description: 'Animal encontrado' })
-  @ApiResponse({ status: 404, description: 'Animal no encontrado' })
+  @ApiParam({ name: 'id', type: String, description: 'UUID de la solicitud' })
+  @ApiResponse({ status: 200, description: 'Solicitud encontrada' })
+  @ApiResponse({ status: 404, description: 'Solicitud no encontrada' })
 
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -42,6 +43,8 @@ export class AdoptionRequestsController {
   @ApiOperation({ summary: 'Aprobar o rechazar una solicitud' })
   @ApiParam({ name: 'id', type: String, description: 'UUID de la solicitud' })
   @ApiResponse({ status: 200, description: 'Estado actualizado' })
+  @ApiResponse({ status: 400, description: 'Status inválido (debe ser aprobada o rechazada)' })
+  @ApiResponse({ status: 404, description: 'Solicitud no encontrada' })
   @Patch(':id/status')
   updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
